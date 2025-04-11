@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #047971;
+      padding: 2rem;
+    }
+    h1 {
+      text-align: center;
+    }
+    .todo-container {
+      max-width: 400px;
+      margin: 0 auto;
+      background: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input {
+      width: 70%;
+      padding: 0.5rem;
+      margin-right: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: #007bff;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+    li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem;
+      border-bottom: 1px solid #eee;
+    }
+    li.done span {
+      text-decoration: line-through;
+      color: gray;
+    }
+    .actions button {
+      margin-left: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>To-Do App</h1>
+  <div class="todo-container">
+    <input type="text" id="taskInput" placeholder="Add a task" />
+    <button onclick="addTask()">Add</button>
+    <ul id="taskList"></ul> 
+    <select id = "miter"> 
+        <option value="high">high</option>
+        <option value="medium"> medium</option> 
+        <option value="low">low</option>
+  </select> 
+  </div>
+
+  <script>
+    const taskInput = document.getElementById("taskInput");
+    const taskList = document.getElementById("taskList");
+
+    // Load tasks from localStorage
+    window.onload = function () {
+      const saved = JSON.parse(localStorage.getItem("tasks")) || [];
+      saved.forEach(task => renderTask(task.text, task.done));
+    };
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (text) {
+        renderTask(text);
+        saveTasks();
+        taskInput.value = "";
+      }
+    }
+
+    function renderTask(text, done = false) {
+      const li = document.createElement("li");
+      if (done) li.classList.add("done");
+
+      const span = document.createElement("span");
+      span.textContent = text;
+      span.onclick = () => {
+        li.classList.toggle("done");
+        saveTasks();
+      };
+
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "❌";
+      delBtn.onclick = () => {
+        li.remove();
+        saveTasks();
+      };
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      actions.appendChild(delBtn);
+
+      li.appendChild(span);
+      li.appendChild(actions);
+      taskList.appendChild(li);
+    }
+
+    function saveTasks() {
+      const tasks = [];
+      taskList.querySelectorAll("li").forEach(li => {
+        tasks.push({
+          text: li.querySelector("span").textContent,
+          done: li.classList.contains("done")
+        });
+      });
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+  </script>
+</body>
+</html>
